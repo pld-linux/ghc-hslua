@@ -6,13 +6,13 @@
 Summary:	A Lua language interpreter embedding in Haskell
 Summary(pl.UTF-8):	Osadzanie interpretera języka Lua w Haskellu
 Name:		ghc-%{pkgname}
-Version:	0.3.9
+Version:	1.1.0
 Release:	1
 License:	MIT
 Group:		Development/Languages
 #Source0Download: http://hackage.haskell.org/package/hslua
 Source0:	http://hackage.haskell.org/package/%{pkgname}-%{version}/%{pkgname}-%{version}.tar.gz
-# Source0-md5:	20db7a460496c29b293af647e50da520
+# Source0-md5:	765647d6f5788fa12f5d82557e73786c
 URL:		http://hackage.haskell.org/package/hslua
 BuildRequires:	ghc >= 6.12.3
 BuildRequires:	ghc-base >= 4
@@ -24,7 +24,7 @@ BuildRequires:	ghc-base-prof >= 4
 BuildRequires:	ghc-base-prof < 5
 BuildRequires:	ghc-mtl-prof >= 2.1
 %endif
-BuildRequires:	lua51-devel >= 5.1.4
+BuildRequires:	lua53-devel
 BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.608
 BuildRequires:	sed >= 4.0
@@ -42,11 +42,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautocompressdoc	*.haddock
 
 %description
-The Scripting.Lua module is a wrapper of Lua language interpreter as
+The Foreign.Lua module is a wrapper of Lua language interpreter as
 described in <http://www.lua.org/>.
 
 %description -l pl.UTF-8
-Moduł Scripting.Lua to obudowanie interpretera języka Lua, opisanego
+Moduł Foreign.Lua to obudowanie interpretera języka Lua, opisanego
 na <http://www.lua.org/>.
 
 %package prof
@@ -80,12 +80,10 @@ Dokumentacja w formacie HTML dla pakietu ghc %{pkgname}.
 %prep
 %setup -q -n %{pkgname}-%{version}
 
-%{__sed} -i -e '/Pkgconfig-depends/s/lua/lua51/' hslua.cabal
-
 %build
 runhaskell Setup.hs configure -v2 \
 	%{?with_prof:--enable-library-profiling} \
-	--flags=system-lua \
+	--flags=pkg-config \
 	--prefix=%{_prefix} \
 	--libdir=%{_libdir} \
 	--libexecdir=%{_libexecdir} \
@@ -119,22 +117,33 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc COPYRIGHT
+%doc CHANGELOG.md LICENSE README.md
 %{_libdir}/%{ghcdir}/package.conf.d/%{pkgname}.conf
 %dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/HShslua-%{version}.o
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHShslua-%{version}.a
-%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Scripting
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Scripting/Lua.hi
-%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Scripting/Lua
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Scripting/Lua/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHShslua-%{version}-*.so
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHShslua-%{version}-*.a
+%exclude %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHShslua-%{version}-*_p.a
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/*.dyn_hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/*.dyn_hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Core
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Core/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Core/*.dyn_hi
+%dir %{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Types
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Types/*.hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Types/*.dyn_hi
 
 %if %{with prof}
 %files prof
 %defattr(644,root,root,755)
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHShslua-%{version}_p.a
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Scripting/Lua.p_hi
-%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Scripting/Lua/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/libHShslua-%{version}-*_p.a
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Core/*.p_hi
+%{_libdir}/%{ghcdir}/%{pkgname}-%{version}/Foreign/Lua/Types/*.p_hi
 %endif
 
 %files doc
