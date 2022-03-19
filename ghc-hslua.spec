@@ -7,7 +7,7 @@ Summary:	A Lua language interpreter embedding in Haskell
 Summary(pl.UTF-8):	Osadzanie interpretera języka Lua w Haskellu
 Name:		ghc-%{pkgname}
 Version:	1.1.0
-Release:	1
+Release:	2
 License:	MIT
 Group:		Development/Languages
 #Source0Download: http://hackage.haskell.org/package/hslua
